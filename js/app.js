@@ -31,6 +31,17 @@ app.config(function($routeProvider) {
     });
 });
 
+// Global Error Handler to catch $http:baddata and other API parsing errors
+app.factory('$exceptionHandler', function() {
+    return function(exception, cause) {
+        if (exception.message && exception.message.includes('$http:baddata')) {
+            alert("API Error: The server returned invalid data (likely a PHP error). Please check your server or try again.");
+        } else {
+            console.error(exception);
+        }
+    };
+});
+
 // Service to manage User Authentication state
 app.factory('AuthService', function($window) {
     return {

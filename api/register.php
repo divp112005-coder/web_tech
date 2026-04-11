@@ -14,10 +14,19 @@ if (
         $query = "INSERT INTO users (first_name, last_name, username, password_hash, email) VALUES (:first_name, :last_name, :username, :password_hash, :email)";
         $stmt = $conn->prepare($query);
 
-        $first_name = htmlspecialchars(strip_tags($data->first_name));
-        $last_name = htmlspecialchars(strip_tags($data->last_name));
-        $username = htmlspecialchars(strip_tags($data->username));
-        $email = htmlspecialchars(strip_tags($data->email));
+        // Server-side Sanitization
+        $first_name = htmlspecialchars(strip_tags(trim($data->first_name)));
+        $last_name = htmlspecialchars(strip_tags(trim($data->last_name)));
+        $username = htmlspecialchars(strip_tags(trim($data->username)));
+        $email = filter_var(trim($data->email), FILTER_SANITIZE_EMAIL);
+        
+        // Basic Email Validation
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            http_response_code(400);
+            echo json_encode(array("message" => "Invalid email format."));
+            exit();
+        }
+
         $password_hash = password_hash($data->password, PASSWORD_BCRYPT);
 
         $stmt->bindParam(':first_name', $first_name);
