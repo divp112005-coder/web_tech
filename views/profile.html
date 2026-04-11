@@ -1,0 +1,46 @@
+<div class="profile-container">
+    <div class="profile-sidebar">
+        <div class="profile-avatar">
+            {{ currentUser.first_name.charAt(0) }}{{ currentUser.last_name.charAt(0) }}
+        </div>
+        <h3>{{ currentUser.first_name }} {{ currentUser.last_name }}</h3>
+        <p class="profile-username">@{{ currentUser.username }}</p>
+        <hr>
+        <div class="profile-details">
+            <p><strong>Email:</strong><br>{{ profileData.user.email }}</p>
+            <p><strong>Member Since:</strong><br>{{ profileData.user.created_at | date:'mediumDate' }}</p>
+        </div>
+    </div>
+
+    <div class="profile-main">
+        <h2>Your Order History</h2>
+        
+        <div class="alert alert-error" ng-if="profileData.orders.length === 0">
+            You haven't placed any orders yet. <a href="#!/menu" style="color: var(--primary);">Explore our menu!</a>
+        </div>
+
+        <div class="order-card" ng-repeat="order in profileData.orders">
+            <div class="order-header">
+                <div>
+                    <span class="order-id">Order #{{ order.id }}</span>
+                    <span class="order-date">{{ order.created_at | date:'medium' }}</span>
+                </div>
+                <div class="order-status-badge {{ order.status | lowercase }}">{{ order.status }}</div>
+            </div>
+            <div class="order-body">
+                <table class="order-items-table">
+                    <tbody>
+                        <tr ng-repeat="item in order.items">
+                            <td>{{ item.quantity }}x</td>
+                            <td>{{ item.name }}</td>
+                            <td class="text-right">₹{{ item.price_at_order | number:2 }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="order-footer">
+                <strong>Total Paid:</strong> <span class="order-total">₹{{ order.total_price | number:2 }}</span>
+            </div>
+        </div>
+    </div>
+</div>

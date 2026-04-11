@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="foodOrderApp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eats Direct - Online Food Ordering</title>
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Vanilla CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Header / Navigation -->
+    <header class="navbar">
+        <div class="logo">Eats Direct</div>
+        <nav ng-controller="NavController">
+            <ul>
+                <li><a href="#!/menu">Menu</a></li>
+                <li ng-if="!isLoggedIn()"><a href="#!/login">Login</a></li>
+                <li ng-if="!isLoggedIn()"><a href="#!/register" class="btn btn-outline">Register</a></li>
+                <li ng-if="isLoggedIn()"><a href="#!/profile">Welcome, {{ currentUser.first_name }}</a></li>
+                <li ng-if="isLoggedIn()"><a href="#!/cart">Cart (<span class="cart-count">{{ cartCount() }}</span>)</a></li>
+                <li ng-if="isLoggedIn()"><a href="" ng-click="logout()">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content Area where Views will be injected -->
+    <main class="container">
+        <div ng-view></div>
+    </main>
+
+    <!-- AngularJS 1.x & ngRoute -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.min.js"></script>
+    
+    <!-- App Logic -->
+    <script src="js/app.js"></script>
+</body>
+</html>
