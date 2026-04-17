@@ -7,10 +7,10 @@ header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json; charset=UTF-8");
 
 // TODO: Confirm the DB Name placeholder with your actual InfinityFree Database Name in vPanel!
-$host = 'sql100.infinityfree.com'; // MySQL Hostname from InfinityFree
-$db_name = 'if0_41634489_food_db'; // Assuming food_db is your DB name, confirm in vPanel
-$username = 'if0_41634489'; // Your InfinityFree vPanel Username
-$password = 'xsAE24YtGiDuQi'; // Your InfinityFree control panel password or DB password
+$host = 'localhost'; // 'sql100.infinityfree.com'; // MySQL Hostname from InfinityFree
+$db_name = 'food_order_db'; // 'if0_41634489_food_db'; // Assuming food_db is your DB name, confirm in vPanel
+$username = 'root'; //'if0_41634489'; // Your InfinityFree vPanel Username
+$password = ''; //'xsAE24YtGiDuQi'; // Your InfinityFree control panel password or DB password
 
 try {
     // 1. Establish secure PDO connection

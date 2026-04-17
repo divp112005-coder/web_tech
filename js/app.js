@@ -3,8 +3,7 @@ var app = angular.module('foodOrderApp', ['ngRoute']);
 app.config(function($routeProvider) {
     $routeProvider
     .when("/", {
-        templateUrl : "views/menu.html",
-        controller : "MenuController"
+        redirectTo: "/login"
     })
     .when("/menu", {
         templateUrl : "views/menu.html",
@@ -27,7 +26,7 @@ app.config(function($routeProvider) {
         controller : "ProfileController"
     })
     .otherwise({
-        redirectTo: "/"
+        redirectTo: "/login"
     });
 });
 
@@ -140,6 +139,12 @@ app.controller('NavController', function($scope, $location, AuthService, CartSer
 
 // Controller for Auth (Login & Register)
 app.controller('AuthController', function($scope, $http, $location, AuthService) {
+    // If user is already logged in, redirect them to the menu instead of showing auth pages
+    if (AuthService.isLoggedIn()) {
+        $location.path('/menu');
+        return;
+    }
+
     $scope.loginData = {};
     $scope.regData = {};
     $scope.errorMessage = '';
@@ -186,19 +191,62 @@ app.controller('AuthController', function($scope, $http, $location, AuthService)
 
 // Controller for Menu
 app.controller('MenuController', function($scope, $http, CartService, AuthService, $location) {
-    $scope.groupedMenu = {};
-    
+    $scope.categories = [];  // Array of { name, icon, isOpen, items }
+    $scope.searchQuery = '';
+
+    // Category display order and icons
+    var categoryMeta = [
+        { name: 'Starters',       icon: '🥗' },
+        { name: 'Main Course',    icon: '🍛' },
+        { name: 'Rice & Biryani', icon: '🍚' },
+        { name: 'Breads',         icon: '🫓' },
+        { name: 'South Indian',   icon: '🥘' },
+        { name: 'Desserts',       icon: '🍮' },
+        { name: 'Beverages',      icon: '🥤' }
+    ];
+
+    $scope.toggleCategory = function(cat) {
+        cat.isOpen = !cat.isOpen;
+    };
+
     $http.get('api/menu.php')
     .then(function(response) {
-        if(response.data.records) {
-            // Group items by category
+        if (response.data.records) {
             var items = response.data.records;
+
+            // Group items into a plain map first
+            var rawMap = {};
             items.forEach(function(item) {
-                if (!$scope.groupedMenu[item.category]) {
-                    $scope.groupedMenu[item.category] = [];
+                if (!rawMap[item.category]) {
+                    rawMap[item.category] = [];
                 }
-                $scope.groupedMenu[item.category].push(item);
+                rawMap[item.category].push(item);
             });
+
+            // Build ordered array from categoryMeta, then any extras
+            var result = [];
+            categoryMeta.forEach(function(meta) {
+                if (rawMap[meta.name]) {
+                    result.push({
+                        name:   meta.name,
+                        icon:   meta.icon,
+                        isOpen: result.length === 0, // auto-open first
+                        items:  rawMap[meta.name]
+                    });
+                    delete rawMap[meta.name];
+                }
+            });
+            // Append any DB categories not in the predefined list
+            Object.keys(rawMap).forEach(function(extra) {
+                result.push({
+                    name:   extra,
+                    icon:   '🍽️',
+                    isOpen: false,
+                    items:  rawMap[extra]
+                });
+            });
+
+            $scope.categories = result;
         }
     }, function(error) {
         console.error("Error fetching menu:", error);

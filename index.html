@@ -39,5 +39,58 @@
     
     <!-- App Logic -->
     <script src="js/app.js"></script>
+
+    <!-- ===== INLINE TEMPLATES (bypasses template file caching) ===== -->
+
+    <script type="text/ng-template" id="views/menu.html">
+        <div class="menu-header">
+            <h2>Our Delicious Menu</h2>
+            <p style="color:var(--gray);">Freshly prepared, delivered hot to your door.</p>
+            <div class="menu-search-bar">
+                <input type="text" id="menuSearch" ng-model="searchQuery"
+                       placeholder="Search dishes..." class="menu-search-input" />
+            </div>
+        </div>
+
+        <div class="alert alert-error" ng-if="categories.length === 0">
+            Menu is currently empty or could not be loaded.
+        </div>
+
+        <div ng-repeat="cat in categories track by $index">
+
+            <!-- HEADER: always visible, toggles body -->
+            <div class="acc-header" ng-click="cat.isOpen = !cat.isOpen">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <span style="font-size:1.4rem;">{{ cat.icon }}</span>
+                    <strong style="font-size:1.1rem;letter-spacing:-0.2px;">{{ cat.name }}</strong>
+                    <span class="acc-badge">{{ (cat.items | filter:searchQuery).length }} items</span>
+                </div>
+                <span class="acc-arrow" ng-class="{'acc-arrow-open': cat.isOpen}">&#9660;</span>
+            </div>
+
+            <!-- BODY: physically removed from DOM when closed -->
+            <div class="acc-body" ng-if="cat.isOpen">
+                <p ng-if="(cat.items | filter:searchQuery).length === 0"
+                   style="color:var(--gray);text-align:center;padding:1rem 0;">
+                    No items match "{{ searchQuery }}".
+                </p>
+                <div class="menu-grid">
+                    <div class="menu-card" ng-repeat="item in cat.items | filter:searchQuery track by item.id">
+                        <div class="menu-content" style="padding:1.5rem;">
+                            <h3 style="font-size:1.05rem;margin-bottom:0.35rem;">{{ item.name }}</h3>
+                            <p class="menu-desc">{{ item.description }}</p>
+                            <div class="menu-footer" style="margin-top:1rem;">
+                                <span class="menu-price">&#8377;{{ item.price | number:2 }}</span>
+                                <button class="btn btn-outline" ng-click="addToCart(item)"
+                                        id="add-{{ item.id }}">+ Add</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </script>
+
 </body>
 </html>
